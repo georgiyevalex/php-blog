@@ -1,0 +1,1 @@
+{include file="../../blocks/posts/page_view/index.tpl"}
