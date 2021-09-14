@@ -2,9 +2,10 @@
 
 use Controllers\MainController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 require_once __DIR__ . '/../bootstrap.php';
 
-    $request = new Request(
+$request = new Request(
     $_GET,
     $_POST,
     [],
@@ -13,4 +14,11 @@ require_once __DIR__ . '/../bootstrap.php';
     $_SERVER
 );
 
-(new MainController($request, $smarty, $connection))();
+$response = new Response();
+
+(new MainController(
+    $request,
+    $response,
+    $smarty,
+    $connection
+))();

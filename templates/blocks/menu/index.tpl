@@ -1,2 +1,2 @@
-<li><a href="/" class="nav-link px-0 me-3{if $url == Blog\Destination::DESTINATION_HOME} text-white{else} text-secondary{/if}">{Blog\Destination::DESTINATION_HOME|upper}</a></li>
-<li><a href="/about" class="nav-link px-0 me-3{if $url == Blog\Destination::DESTINATION_ABOUT} text-white{else} text-secondary{/if}">{Blog\Destination::DESTINATION_ABOUT|upper}</a></li>
+<li><a href="/" class="nav-link px-0 me-3{if $url == Blog\Destination::DESTINATION_HOME} text-dark{else} text-secondary{/if}">{Blog\Destination::DESTINATION_HOME|upper}</a></li>
+<li><a href="/about" class="nav-link px-0 me-3{if $url == Blog\Destination::DESTINATION_ABOUT} text-dark{else} text-secondary{/if}">{Blog\Destination::DESTINATION_ABOUT|upper}</a></li>

@@ -4,7 +4,7 @@
     <div class="card-body">
       <h5 class="card-title text-black-50">{$post.title}</h5>
       <p class="card-text text-black">{$post.description}</p>
-      <a href="{$post.url_key}" class="btn btn-primary">Go somewhere</a>
+      <a href="/posts/{$post.url_key}" class="btn btn-primary">Go somewhere</a>
     </div>
   </div>
 {/foreach}

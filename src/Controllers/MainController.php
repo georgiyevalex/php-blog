@@ -4,7 +4,10 @@ namespace Controllers;
 
 use Blog\Destination;
 use Controllers\PostsController;
-use Symfony\Component\HttpFoundation\Request;
+use Controllers\AuthorizationController;
+use App\Session;
+use Exceptions\AuthorizationException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -19,6 +22,10 @@ class MainController
      */
     private $request;
     /**
+     * @var $response
+     */
+    private $response;
+    /**
      * @var $smarty
      */
     private  $smarty;
@@ -28,42 +35,109 @@ class MainController
     private $connection;
 
 
-    public function __construct($request, $smarty, $connection)
+    public function __construct($request, $response, $smarty, $connection)
     {
         $this->request = $request;
+        $this->response = $response;
         $this->smarty = $smarty;
         $this->connection = $connection;
     }
 
     public function __invoke()
     {
+        $session = new Session();
+        $session->start();
 
         $postMapper = new PostsController($this->connection);
-
-
+        $authorization = new AuthorizationController($this->connection, $session);
         $routes = new RouteCollection();
         $data = [];
+        $data['user'] = $session->getData('user');
 
         $_routes = [
             '/' => function () use ($postMapper, &$data) {
                 $data['posts'] = $postMapper->getAllPosts('DESC');
                 $data['url'] = Destination::DESTINATION_HOME;
-
             },
             '/about' => function () use (&$data) {
                 $data['url'] = Destination::DESTINATION_ABOUT;
             },
-            '/{url_key}' => function () use ($postMapper, &$data) {
-                $url_key = ltrim($_SERVER[REQUEST_URI], '/');
+            '/posts/{url_key}' => function () use ($postMapper, &$data) {
+                $url_key = ltrim($this->request->getPathInfo(), '/posts/');
                 $post = $postMapper->getPostByUrlKey($url_key);
-                $data['url'] = Destination::DESTINATION_POSTS;
                 if($post) {
+                    $data['url'] = Destination::DESTINATION_POSTS;
                     $data['post'] = $post;
-                } else {
-                    $data['url'] = '';
+                }
+            },
+            '/registration' => function () use ($session, &$data) {
+                if($data['user'] != null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
                 }
 
+                $data['url'] = Destination::DESTINATION_REGISTRATION;
+                $data['message'] = $session->flush('message');
+                $data['form'] = $session->flush('form');
             },
+            '/register' => function () use ($authorization, $session, &$data) {
+                if($data['user'] != null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
+                }
+
+                parse_str($this->request->getContent(), $params);
+
+                try {
+                    $authorization->register($params);
+                } catch (AuthorizationException $exception) {
+                    echo $exception->getMessage();
+                    $session->setData('message', $exception->getMessage());
+                    $session->setData('form', $params);
+                    $session->save();
+                    $this->response = new RedirectResponse('/registration');
+                    $this->response->send();
+                }
+
+                $this->response = new RedirectResponse('/');
+                $this->response->send();
+            },
+            '/login' => function () use ($session, &$data) {
+                if($data['user'] != null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
+                }
+
+                $data['url'] = Destination::DESTINATION_LOGIN;
+                $data['message'] = $session->flush('message');
+                $data['form'] = $session->flush('form');
+            },
+            '/login-page' => function () use ($authorization, $session, &$data) {
+                if($data['user'] != null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
+                }
+
+                parse_str($this->request->getContent(), $params);
+                try {
+                    $authorization->login($params);
+                } catch (AuthorizationException $exception) {
+                    echo $exception->getMessage();
+                    $session->setData('message', $exception->getMessage());
+                    $session->setData('form', $params);
+                    $session->save();
+                    $this->response = new RedirectResponse('/login');
+                    $this->response->send();
+                }
+
+                $this->response = new RedirectResponse('/');
+                $this->response->send();
+            },
+            '/logout' => function () use ($session) {
+                $session->setData('user', null);
+                $this->response = new RedirectResponse('/');
+                $this->response->send();
+            }
         ];
 
         $_route_index = 0;
