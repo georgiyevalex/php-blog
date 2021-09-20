@@ -1,0 +1,1 @@
+{include file="../blocks/registration/registration.tpl"}

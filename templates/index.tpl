@@ -10,24 +10,24 @@
 </head>
 <body class="bg-light text-dark">
 <div class="container bg-white text-dark min-vh-100">
-{include file="blocks/header/index.tpl"}
+{include file="blocks/header.tpl"}
 <main>
   {if $url == Blog\Destination::DESTINATION_HOME}
-    {include file="pages/home/index.tpl"}
+    {include file="pages/home_page.tpl"}
   {elseif $url == Blog\Destination::DESTINATION_ABOUT}
-      {include file="pages/about/index.tpl"}
+      {include file="pages/about_page.tpl"}
   {elseif $url == Blog\Destination::DESTINATION_POSTS}
-      {include file="pages/posts/index.tpl"}
+      {include file="pages/post_page.tpl"}
   {elseif $url == Blog\Destination::DESTINATION_REGISTRATION}
-      {include file="pages/registration/index.tpl"}
+      {include file="pages/registration_page.tpl"}
   {elseif $url == Blog\Destination::DESTINATION_LOGIN}
-      {include file="pages/login/index.tpl"}
+      {include file="pages/login_page.tpl"}
   {else}
-      {include file="pages/404/index.tpl"}
+      {include file="pages/404.tpl"}
   {/if}
 </main>
 
-{include file="blocks/footer/index.tpl"}
+{include file="blocks/footer.tpl"}
 </div>
 <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/js/main.js"></script>

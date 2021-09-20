@@ -1,0 +1,1 @@
+{include file="../blocks/registration/login.tpl"}
