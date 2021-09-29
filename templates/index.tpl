@@ -22,6 +22,8 @@
       {include file="pages/registration_page.tpl"}
   {elseif $url == Blog\Destination::DESTINATION_LOGIN}
       {include file="pages/login_page.tpl"}
+  {elseif $url == Blog\Destination::DESTINATION_PROFILE}
+      {include file="pages/profile_page.tpl"}
   {else}
       {include file="pages/404.tpl"}
   {/if}

@@ -101,7 +101,9 @@ class AuthorizationController
         if(password_verify($params['password'], $user['password'])) {
             $this->session->setData('user', [
                 'user_id' => $user['user_id'],
-                'username' => $user['first_name'],
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'role' => $user['role'],
                 'email' => $user['email']
             ]);
             $this->session->save();

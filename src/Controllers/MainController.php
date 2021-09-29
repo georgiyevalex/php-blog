@@ -80,6 +80,14 @@ class MainController
                 $data['message'] = $session->flush('message');
                 $data['form'] = $session->flush('form');
             },
+            'profile' => function () use ($session, &$data) {
+                if($data['user'] == null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
+                }
+
+                $data['url'] = Destination::DESTINATION_PROFILE;
+            },
             '/register' => function () use ($authorization, $session, &$data) {
                 if($data['user'] != null) {
                     $this->response = new RedirectResponse('/');
