@@ -1,4 +1,5 @@
 /.idea
 /Nginx_1.21_vhost.conf
+/Nginx_1.17_vhost.conf
 /composer.lock
 /vendor/

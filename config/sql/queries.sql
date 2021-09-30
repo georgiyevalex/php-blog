@@ -1,3 +1,9 @@
+/*0. Create dbConnect.php file
+    'dsn' => 'mysql:host=127.0.0.1;dbname=db_name',
+    'username' => 'userName',
+    'password'=> 'userPassword'
+ */
+
 /*1. Create database*/
 CREATE DATABASE php_blog;
 
