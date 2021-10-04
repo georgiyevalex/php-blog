@@ -1,4 +1,4 @@
-<div class="card mb-3">
+<div class="card mb-3 mt-4">
   {if $post.image_path}
     <img src="{$post.image_path}" class="card-img-top img-fluid" alt="...">
   {else}

@@ -5,37 +5,47 @@ namespace Controllers;
 use Blog\Destination;
 use Controllers\PostsController;
 use Controllers\AuthorizationController;
+use Controllers\SearchController;
 use App\Session;
 use Exceptions\AuthorizationException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Smarty;
+use PDO;
 
 class MainController
 {
     /**
-     * @var $request
+     * @var Request
      */
-    private $request;
+    private Request $request;
     /**
-     * @var $response
+     * @var Response
      */
-    private $response;
+    private Response $response;
     /**
-     * @var $smarty
+     * @var Smarty
      */
-    private  $smarty;
+    private Smarty $smarty;
     /**
-     * @var $connection;
+     * @var PDO
      */
-    private $connection;
+    private PDO $connection;
 
 
-    public function __construct($request, $response, $smarty, $connection)
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param Smarty $smarty
+     * @param PDO $connection
+     */
+    public function __construct(Request $request, Response $response, Smarty $smarty, PDO $connection)
     {
         $this->request = $request;
         $this->response = $response;
@@ -50,6 +60,7 @@ class MainController
 
         $postMapper = new PostsController($this->connection);
         $authorization = new AuthorizationController($this->connection, $session);
+        $search = new SearchController($this->connection);
         $routes = new RouteCollection();
         $data = [];
         $data['user'] = $session->getData('user');
@@ -80,7 +91,7 @@ class MainController
                 $data['message'] = $session->flush('message');
                 $data['form'] = $session->flush('form');
             },
-            'profile' => function () use ($session, &$data) {
+            '/profile' => function () use ($session, &$data) {
                 if($data['user'] == null) {
                     $this->response = new RedirectResponse('/');
                     $this->response->send();
@@ -145,6 +156,16 @@ class MainController
                 $session->setData('user', null);
                 $this->response = new RedirectResponse('/');
                 $this->response->send();
+            },
+            '/search' => function () use ($search, &$data) {
+                $data['url'] = Destination::DESTINATION_SEARCH;
+                $searchText = $this->request->get('search_text');
+
+                $searchResult = $search->searchPostByText($searchText);
+
+                $data['posts'] = $searchResult;
+                $data['search_text'] = $searchText;
+
             }
         ];
 

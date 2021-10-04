@@ -24,6 +24,8 @@
       {include file="pages/login_page.tpl"}
   {elseif $url == Blog\Destination::DESTINATION_PROFILE}
       {include file="pages/profile_page.tpl"}
+  {elseif $url == Blog\Destination::DESTINATION_SEARCH}
+      {include file="pages/search_page.tpl"}
   {else}
       {include file="pages/404.tpl"}
   {/if}

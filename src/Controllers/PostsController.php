@@ -26,7 +26,7 @@ class PostsController
      */
     public function getPostByUrlKey(string $urlKey) : ?array
     {
-        $statement = $this->connection->prepare('SELECT * FROM post WHERE url_key = :url_key');
+        $statement = $this->connection->prepare('SELECT * FROM `post` WHERE `url_key` = :url_key');
         $statement->execute([
            'url_key' => $urlKey
         ]);
@@ -45,7 +45,7 @@ class PostsController
         if(!in_array($direction, ['DESC', 'ASC'])) {
             throw new Exception('The direction is not supported.');
         }
-        $statement = $this->connection->prepare('SELECT * FROM post ORDER BY published_date ' . $direction);
+        $statement = $this->connection->prepare('SELECT * FROM `post` ORDER BY `published_date` ' . $direction);
         $statement->execute();
 
         return $statement->fetchAll();
