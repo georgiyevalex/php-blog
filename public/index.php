@@ -3,6 +3,7 @@
 use Controllers\MainController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 require_once __DIR__ . '/../bootstrap.php';
 
 $request = new Request(
@@ -16,6 +17,7 @@ $request = new Request(
 
 $response = new Response();
 
+/** @noinspection PhpUnhandledExceptionInspection */
 (new MainController(
     $request,
     $response,

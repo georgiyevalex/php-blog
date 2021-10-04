@@ -13,4 +13,5 @@ class Destination
     const DESTINATION_LOGIN_PAGE = 'login-page';
     const DESTINATION_LOGOUT = 'logout';
     const DESTINATION_PROFILE = 'profile';
+    const DESTINATION_SEARCH = 'search';
 }
