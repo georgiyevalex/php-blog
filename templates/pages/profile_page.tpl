@@ -19,7 +19,7 @@
           <h6>
               {$user.role|capitalize}
           </h6>
-          <p class="proile-rating">RANKINGS : <span>8/10</span></p>
+          <p class="profile-rating">RANKINGS : <span>8/10</span></p>
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
               <button  class="nav-link active" id="home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">About</button >
