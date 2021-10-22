@@ -1,0 +1,41 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    hostname: mysql
+    environment:
+      MYSQL_DATABASE: php_blog
+      MYSQL_ROOT_USER: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3305:3306"
+  php:
+    image: php:7.4-fpm
+    hostname: php
+    volumes:
+      - "./:/var/www/php-blog"
+    working_dir: "/var/www/php-blog/"
+    depends_on:
+      - mysql
+  nginx:
+    image: nginx:latest
+    hostname: nginx
+    environment:
+      WEB_DOCUMENT_ROOT: /var/www/php-blog/public
+      WEB_DOCUMENT_INDEX: index.php
+      WEB_PHP_SOCKET: php-fpm:9000
+    ports:
+      - "80:80"
+    volumes:
+      - "./:/var/www/php-blog"
+#      - "/config/nginx/nginx.conf:/etc/nginx/sites-available/php-blog.conf"
+#      - "/config/nginx/nginx.conf:/etc/nginx/sites-enabled/php-blog.conf"
+    depends_on:
+      - php
+  composer:
+    image: composer:latest
+    command: install --ignore-platform-reqs
+    restart: "no"
+    working_dir: "/var/www/php-blog/"
+    volumes:
+      - "./:/var/www/php-blog"
