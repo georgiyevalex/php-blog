@@ -1,17 +1,12 @@
 <link rel="stylesheet" href="/static/css/profile.css">
 <div class="container emp-profile">
-  <form method="post">
     <div class="row">
       <div class="col-md-4">
-        <div class="profile-img">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt=""/>
-          <div class="file btn btn-lg btn-primary">
-            Change Photo
-            <input type="file" name="file"/>
-          </div>
+        <div class="profile-image">
+          <img src="https://dummyimage.com/300x200/c0bfd6/2e2f3d&text=Dummy+image" alt="profile-image">
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-8">
         <div class="profile-head">
           <h5>
             {$user.first_name|capitalize} {$user.last_name|capitalize}
@@ -30,25 +25,9 @@
           </ul>
         </div>
       </div>
-      <div class="col-md-2">
-        <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
-      </div>
     </div>
     <div class="row">
-      <div class="col-md-4">
-        <div class="profile-work">
-          <p>WORK LINK</p>
-          <a href="">Website Link</a><br/>
-          <a href="">Bootsnipp Profile</a><br/>
-          <a href="">Bootply Profile</a>
-          <p>SKILLS</p>
-          <a href="">Web Designer</a><br/>
-          <a href="">Web Developer</a><br/>
-          <a href="">WordPress</a><br/>
-          <a href="">WooCommerce</a><br/>
-          <a href="">PHP, .Net</a><br/>
-        </div>
-      </div>
+      <div class="col-md-4"></div>
       <div class="col-md-8">
         <div class="tab-content profile-tab" id="myTabContent">
           <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home">
@@ -152,5 +131,4 @@
         </div>
       </div>
     </div>
-  </form>
 </div>
