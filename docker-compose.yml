@@ -4,31 +4,6 @@ networks:
   php-blog:
 
 services:
-  mysql-service:
-    image: mysql:8.0
-    container_name: mysql8-container
-    environment:
-      MYSQL_DATABASE: php_blog
-      MYSQL_ROOT_USER: root
-      MYSQL_USER: root
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    ports:
-      - "3305:3306"
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    restart: always # always restart unless stopped manually
-    networks:
-      - php-blog
-  php-service:
-    build:
-      context: .
-      dockerfile: ./config/php/Dockerfile
-    container_name: php-container
-    ports:
-      - "9000:9000"
-    volumes:
-      - "./:/var/www/php-blog"
-    networks:
-      - php-blog
   nginx-service:
     image: nginx:stable-alpine
     container_name: nginx-container
@@ -42,3 +17,37 @@ services:
       - mysql-service
     networks:
       - php-blog
+  mysql-service:
+    image: mysql:8.0
+    container_name: mysql8-container
+    volumes:
+      - ./config/sql/queries.sql:/var/www/php-blog/config/sql/queries.sql
+    environment:
+      MYSQL_DATABASE: php_blog
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3305:3306"
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-file /var/www/php-blog/config/sql/queries.sql
+    restart: always # always restart unless stopped manually
+    networks:
+      - php-blog
+  php-service:
+    build:
+      context: .
+      dockerfile: ./config/php/Dockerfile
+    hostname: php
+    volumes:
+      - "./:/var/www/php-blog"
+    working_dir: "/var/www/php-blog/"
+    ports:
+      - "9000:9000"
+    networks:
+      - php-blog
+  composer:
+    image: composer:latest
+    command: install --ignore-platform-reqs
+    restart: "no"
+    working_dir: "/var/www/php-blog/"
+    volumes:
+      - "./:/var/www/php-blog"

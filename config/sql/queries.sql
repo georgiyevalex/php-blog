@@ -4,8 +4,8 @@
     'password'=> 'userPassword'
  */
 
-/*1. Create database*/
-CREATE DATABASE php_blog;
+/*1. Create database
+CREATE DATABASE php_blog;*/
 
 USE php_blog;
 
