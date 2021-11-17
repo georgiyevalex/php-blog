@@ -73,6 +73,11 @@ class MainController
             '/about' => function () use (&$data) {
                 $data['url'] = Destination::DESTINATION_ABOUT;
             },
+            'posts/create-post' => function () use ($session, &$data) {
+                $data['url'] = Destination::DESTINATION_CREATE_POST;
+                $data['message'] = $session->flush('message');
+                $data['post'] = $session->flush('post');
+            },
             '/posts/{url_key}' => function () use ($postMapper, &$data) {
                 $url_key = ltrim($this->request->getPathInfo(), '/posts/');
                 $post = $postMapper->getPostByUrlKey($url_key);

@@ -2,7 +2,7 @@
 
 namespace Controllers;
 
-use Exception;
+use Exceptions\PostsException;
 use PDO;
 
 class PostsController
@@ -38,16 +38,63 @@ class PostsController
     /**
      * @param string $direction
      * @return array|null
-     * @throws Exception
+     * @throws PostsException
      */
     public function getAllPosts(string $direction) : ?array
     {
         if(!in_array($direction, ['DESC', 'ASC'])) {
-            throw new Exception('The direction is not supported.');
+            throw new PostsException('The direction is not supported.');
         }
         $statement = $this->connection->prepare('SELECT * FROM `post` ORDER BY `published_date` ' . $direction);
         $statement->execute();
 
         return $statement->fetchAll();
+    }
+
+    /**
+     * @param array $params
+     * @return bool
+     * @throws PostsException
+     */
+    public function createPost(array $params) : bool {
+        if(empty($params['title'])) {
+            throw new PostsException('Title must not be empty.');
+        }
+        if(empty($params['content'])) {
+            throw new PostsException('Content must not be empty.');
+        }
+        if(empty($params['description'])) {
+            throw new PostsException('Description must not be empty.');
+        }
+        if(empty($params['url_key'])) {
+            throw new PostsException('url_key must not be empty.');
+        }
+        if(!preg_match("[a-z\d\-]", $params['url_key'])) {
+            throw new PostsException('the field can contain lowercase letters, numbers and a sign "-" ');
+        }
+
+        $statement = $this->connection->prepare(
+            'SELECT * FROM `posts` WHERE `url_key` = :url_key'
+        );
+        $statement->execute([
+            'url_key' => $params['url_key']
+        ]);
+        $post = $statement->fetch();
+        if (!empty($post)) {
+            throw new PostsException('post with such url_key exsists');
+        }
+
+        $statement = $this->connection->prepare(
+            'INSERT INTO `posts` (first_name, last_name, email, password) VALUES (:first_name, :last_name, :email, :password)'
+        );
+        $statement->execute([
+            'title' => $params['title'],
+            'description' => $params['description'],
+            'content' => $params['content'],
+            'category' => $params['category'],
+            'image_path' => $params['image_path'],
+            'url_key' => $params['url_key'],
+        ]);
+        return true;
     }
 }

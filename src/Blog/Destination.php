@@ -7,6 +7,7 @@ class Destination
     const DESTINATION_HOME = 'home';
     const DESTINATION_ABOUT = 'about';
     const DESTINATION_POSTS = 'posts';
+    const DESTINATION_CREATE_POST = 'create-post';
     const DESTINATION_REGISTRATION = 'registration';
     const DESTINATION_REGISTER = 'register';
     const DESTINATION_LOGIN = 'login';
