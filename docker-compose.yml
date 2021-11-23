@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 
 networks:
   php-blog:
@@ -13,23 +13,23 @@ services:
       - "./:/var/www/php-blog"
       - "./config/nginx/default.conf:/etc/nginx/conf.d/default.conf"
     depends_on:
-      - php-service
-      - mysql-service
+      - composer
     networks:
       - php-blog
   mysql-service:
-    image: mysql:8.0
+    image: percona
     container_name: mysql8-container
     volumes:
       - ./config/sql/queries.sql:/var/www/php-blog/config/sql/queries.sql
-    environment:
+    environment: 
       MYSQL_DATABASE: php_blog
-      MYSQL_ROOT_USER: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3305:3306"
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-file /var/www/php-blog/config/sql/queries.sql
+    ports: 
+      - '3306:3306'
     restart: always # always restart unless stopped manually
+    command: --init-file /var/www/php-blog/config/sql/queries.sql
     networks:
       - php-blog
   php-service:
@@ -44,10 +44,14 @@ services:
       - "9000:9000"
     networks:
       - php-blog
+    depends_on: 
+      - mysql-service
   composer:
     image: composer:latest
     command: install --ignore-platform-reqs
     restart: "no"
     working_dir: "/var/www/php-blog/"
+    depends_on: 
+      - php-service
     volumes:
       - "./:/var/www/php-blog"

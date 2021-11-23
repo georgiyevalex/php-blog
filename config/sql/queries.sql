@@ -5,7 +5,7 @@
  */
 
 /*1. Create database
-CREATE DATABASE php_blog;*/
+CREATE DATABASE php_blog; */
 
 USE php_blog;
 
