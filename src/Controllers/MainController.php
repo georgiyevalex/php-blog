@@ -115,7 +115,6 @@ class MainController
                 try {
                     $authorization->register($params);
                 } catch (AuthorizationException $exception) {
-                    echo $exception->getMessage();
                     $session->setData('message', $exception->getMessage());
                     $session->setData('form', $params);
                     $session->save();
@@ -146,7 +145,6 @@ class MainController
                 try {
                     $authorization->login($params);
                 } catch (AuthorizationException $exception) {
-                    echo $exception->getMessage();
                     $session->setData('message', $exception->getMessage());
                     $session->setData('form', $params);
                     $session->save();
