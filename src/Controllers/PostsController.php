@@ -69,12 +69,14 @@ class PostsController
         if(empty($params['url_key'])) {
             throw new PostsException('url_key must not be empty.');
         }
-        if(!preg_match("[a-z\d\-]", $params['url_key'])) {
+        if(preg_match("/^[a-z\d\-]+$/", $params['url_key'])) {
+
+        } else {
             throw new PostsException('the field can contain lowercase letters, numbers and a sign "-" ');
         }
 
         $statement = $this->connection->prepare(
-            'SELECT * FROM `posts` WHERE `url_key` = :url_key'
+            'SELECT * FROM `post` WHERE `url_key` = :url_key'
         );
         $statement->execute([
             'url_key' => $params['url_key']
@@ -85,15 +87,15 @@ class PostsController
         }
 
         $statement = $this->connection->prepare(
-            'INSERT INTO `posts` (first_name, last_name, email, password) VALUES (:first_name, :last_name, :email, :password)'
+            'INSERT INTO `post` (title, description, content, image_path, url_key, published_date) VALUES (:title, :description, :content, :image_path, :url_key, :published_date)'
         );
         $statement->execute([
             'title' => $params['title'],
             'description' => $params['description'],
             'content' => $params['content'],
-            'category' => $params['category'],
-            'image_path' => $params['image_path'],
+            'image_path' => $params['image_path'] ?: null,
             'url_key' => $params['url_key'],
+            'published_date' => date("Y-m-d h:i:s")
         ]);
         return true;
     }

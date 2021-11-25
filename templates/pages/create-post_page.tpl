@@ -1,0 +1,1 @@
+{include file="../blocks/posts/create_post.tpl"}

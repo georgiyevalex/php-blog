@@ -4,7 +4,11 @@
     <div class="col-md-9">
         {include file="../blocks/posts/card_view.tpl"}
     </div>
+
     <div class="col-md-3 nav-pills">
+      {if $user}
+        <a href="/{Blog\Destination::DESTINATION_NEW_POST}" class="btn btn-primary mb-4">Add new post</a>
+      {/if}
       <h4 class="mb-4">Categories</h4>
       <nav class="nav flex-column">
         <a class="nav-link justify-content-between align-items-center d-flex active" aria-current="page" href="#">Fashion<span class="badge bg-primary rounded-pill">14</span></a>

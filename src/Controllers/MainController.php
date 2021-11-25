@@ -8,6 +8,7 @@ use Controllers\AuthorizationController;
 use Controllers\SearchController;
 use App\Session;
 use Exceptions\AuthorizationException;
+use Exceptions\PostsException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,13 +74,35 @@ class MainController
             '/about' => function () use (&$data) {
                 $data['url'] = Destination::DESTINATION_ABOUT;
             },
-            'posts/create-post' => function () use ($session, &$data) {
-                $data['url'] = Destination::DESTINATION_CREATE_POST;
-                $data['message'] = $session->flush('message');
+            '/new-post' => function () use ($session, &$data) {
+                if($data['user'] == null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
+                }
+
+                $data['url'] = Destination::DESTINATION_NEW_POST;
+                $data['message'] = $session->flush('post_message');
                 $data['post'] = $session->flush('post');
             },
+            '/create-post' => function () use ($postMapper, $session, &$data) {
+                parse_str($this->request->getContent(), $params);
+
+                try {
+                    $postMapper->createPost($params);
+                } catch (PostsException $exception) {
+                    $session->setData('post_message', $exception->getMessage());
+                    $session->setData('post', $params);
+                    $session->save();
+                    $this->response = new RedirectResponse('/new-post');
+                    $this->response->send();
+                }
+
+                $this->response = new RedirectResponse("/posts/$params[url_key]");
+                $this->response->send();
+            },
             '/posts/{url_key}' => function () use ($postMapper, &$data) {
-                $url_key = ltrim($this->request->getPathInfo(), '/posts/');
+                $path = pathinfo($this->request->getPathInfo());
+                $url_key = $path['basename'];
                 $post = $postMapper->getPostByUrlKey($url_key);
                 if($post) {
                     $data['url'] = Destination::DESTINATION_POSTS;
