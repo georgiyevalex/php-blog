@@ -19,13 +19,13 @@ services:
   mysql-service:
     image: percona
     container_name: mysql8-container
-    volumes:
-      - ./config/sql:/docker-entrypoint-initdb.d
     environment: 
       MYSQL_DATABASE: php_blog
       MYSQL_USER: user
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./config/sql:/docker-entrypoint-initdb.d
     ports: 
       - '3306:3306'
     restart: always # always restart unless stopped manually
