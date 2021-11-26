@@ -20,7 +20,7 @@ services:
     image: percona
     container_name: mysql8-container
     volumes:
-      - ./config/sql/queries.sql:/var/www/php-blog/config/sql/queries.sql
+      - ./config/sql:/docker-entrypoint-initdb.d
     environment: 
       MYSQL_DATABASE: php_blog
       MYSQL_USER: user

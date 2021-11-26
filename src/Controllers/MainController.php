@@ -6,6 +6,7 @@ use Blog\Destination;
 use Controllers\PostsController;
 use Controllers\AuthorizationController;
 use Controllers\SearchController;
+use Controllers\CategoriesController;
 use App\Session;
 use Exceptions\AuthorizationException;
 use Exceptions\PostsException;
@@ -62,19 +63,32 @@ class MainController
         $postMapper = new PostsController($this->connection);
         $authorization = new AuthorizationController($this->connection, $session);
         $search = new SearchController($this->connection);
+        $categories = new CategoriesController($this->connection);
         $routes = new RouteCollection();
         $data = [];
         $data['user'] = $session->getData('user');
 
         $_routes = [
-            '/' => function () use ($postMapper, &$data) {
+            '/' => function () use ($postMapper, $categories, &$data) {
                 $data['posts'] = $postMapper->getAllPosts('DESC');
                 $data['url'] = Destination::DESTINATION_HOME;
+                $data['page'] = $this->request->query->getInt('page');
+                $data['categories'] = $categories->getAllCategories();
+                $data['main_page'] = 1;
+            },
+            '/categories/{category}' => function () use ($postMapper, $categories, &$data) {
+                $path = pathinfo($this->request->getPathInfo());
+                $category = $path['basename'];
+                $data['categories'] = $categories->getAllCategories();
+                $data['current_category'] = $path['basename'];
+                $data['posts'] = $postMapper->getPostsByCategory($category, 'DESC');
+                $data['url'] = Destination::DESTINATION_HOME;
+                $data['category_page'] = 1;
             },
             '/about' => function () use (&$data) {
                 $data['url'] = Destination::DESTINATION_ABOUT;
             },
-            '/new-post' => function () use ($session, &$data) {
+            '/new-post' => function () use ($session, $categories, &$data) {
                 if($data['user'] == null) {
                     $this->response = new RedirectResponse('/');
                     $this->response->send();
@@ -83,6 +97,7 @@ class MainController
                 $data['url'] = Destination::DESTINATION_NEW_POST;
                 $data['message'] = $session->flush('post_message');
                 $data['post'] = $session->flush('post');
+                $data['categories'] = $categories->getAllCategories();
             },
             '/create-post' => function () use ($postMapper, $session, &$data) {
                 parse_str($this->request->getContent(), $params);

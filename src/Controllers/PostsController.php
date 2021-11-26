@@ -51,6 +51,27 @@ class PostsController
         return $statement->fetchAll();
     }
 
+    public function getPostsByCategory(string $category_name, string $direction) : ?array
+    {
+        if(!in_array($direction, ['DESC', 'ASC'])) {
+            throw new PostsException('The direction is not supported.');
+        }
+        $statement = $this->connection->prepare('SELECT * FROM `category` WHERE `category_name` = :category_name');
+        $statement->execute([
+            'category_name' => $category_name
+        ]);
+
+        $category = $statement->fetchAll();
+        $category = array_shift($category);
+
+        $statement = $this->connection->prepare('SELECT * FROM `post` WHERE `category` = :category ORDER BY `published_date` ' . $direction);
+        $statement->execute([
+            'category' => $category['category_id']
+        ]);
+
+        return $statement->fetchAll();
+    }
+
     /**
      * @param array $params
      * @return bool
@@ -68,6 +89,9 @@ class PostsController
         }
         if(empty($params['url_key'])) {
             throw new PostsException('url_key must not be empty.');
+        }
+        if(empty($params['category'])) {
+            throw new PostsException('category must not be empty.');
         }
         if(preg_match("/^[a-z\d\-]+$/", $params['url_key'])) {
 
@@ -87,7 +111,7 @@ class PostsController
         }
 
         $statement = $this->connection->prepare(
-            'INSERT INTO `post` (title, description, content, image_path, url_key, published_date) VALUES (:title, :description, :content, :image_path, :url_key, :published_date)'
+            'INSERT INTO `post` (title, description, content, image_path, url_key, category, published_date) VALUES (:title, :description, :content, :image_path, :url_key, :category, :published_date)'
         );
         $statement->execute([
             'title' => $params['title'],
@@ -95,6 +119,7 @@ class PostsController
             'content' => $params['content'],
             'image_path' => $params['image_path'] ?: null,
             'url_key' => $params['url_key'],
+            'category' => $params['category'],
             'published_date' => date("Y-m-d h:i:s")
         ]);
         return true;

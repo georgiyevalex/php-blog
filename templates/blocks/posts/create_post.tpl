@@ -17,6 +17,14 @@
         <textarea class="form-control" name="description" id="post_description">{$post.description}</textarea>
     </div>
     <div class="col-md-6 mt-2">
+        <label for="category" class="form-label">Category</label>
+        <select class="form-select" aria-label="Default select example" name="category">
+            {foreach $categories as $category}
+                <option value="{$category.category_id}">{$category.category_name}</option>
+            {/foreach}
+        </select>
+    </div>
+    <div class="col-md-6 mt-2">
         <label for="url_key" class="form-label">url_key</label>
         <input type="text" class="form-control" placeholder="url-key-for-the-post" id="url_key" name="url_key" value="{$post.url_key}">
     </div>
