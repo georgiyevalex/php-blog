@@ -8,8 +8,8 @@
       {/if}
       <div class="card-body bg-light match-height d-flex flex-column justify-content-between">
         <div class="card-top-part mb-4">
-          <h5 class="card-title text-black-50">{$post.title}</h5>
-          <p class="card-text text-black">{$post.description}</p>
+          <h5 class="card-title text-black-50">{$post.title|ucfirst}</h5>
+          <p class="card-text text-black">{$post.description|ucfirst}</p>
         </div>
         <div class="card-bot-part d-flex align-items-center justify-content-between">
           <a href="/posts/{$post.url_key}" class="btn btn-primary">Go somewhere</a>

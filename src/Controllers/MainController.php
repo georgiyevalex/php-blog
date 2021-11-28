@@ -55,7 +55,10 @@ class MainController
         $this->connection = $connection;
     }
 
-    public function __invoke()
+    /**
+     * @throws \SmartyException
+     */
+    public function __invoke() :void
     {
         $session = new Session();
         $session->start();
@@ -65,24 +68,42 @@ class MainController
         $search = new SearchController($this->connection);
         $categories = new CategoriesController($this->connection);
         $routes = new RouteCollection();
+
         $data = [];
         $data['user'] = $session->getData('user');
 
+        $pagePostsCount = 9;
+
+        var_dump($this->request->query->getInt('page'));
+
         $_routes = [
-            '/' => function () use ($postMapper, $categories, &$data) {
+            '/' => function () use ($pagePostsCount, $postMapper, $categories, &$data) {
+                var_dump($this->request->query);
+                $page = $this->request->query->getInt('page');
+                $totalPostsCount = $postMapper->getTotalPostCount('');
                 $data['posts'] = $postMapper->getAllPosts('DESC');
                 $data['url'] = Destination::DESTINATION_HOME;
-                $data['page'] = $this->request->query->getInt('page');
                 $data['categories'] = $categories->getAllCategories();
+                $data['pagination'] = [
+                    'current' =>  $page ?: 1,
+                    'paging' => ceil($totalPostsCount / $pagePostsCount)
+                ];
                 $data['main_page'] = 1;
             },
-            '/categories/{category}' => function () use ($postMapper, $categories, &$data) {
+            '/categories/{category}' => function () use ($pagePostsCount, $postMapper, $categories, &$data) {
                 $path = pathinfo($this->request->getPathInfo());
                 $category = $path['basename'];
+                //var_dump($this->request->query);
+                //$page = $this->request->query->getInt('page');
+                $totalPostsCount = $postMapper->getTotalPostCount($category);
                 $data['categories'] = $categories->getAllCategories();
                 $data['current_category'] = $path['basename'];
                 $data['posts'] = $postMapper->getPostsByCategory($category, 'DESC');
                 $data['url'] = Destination::DESTINATION_HOME;
+                $data['pagination'] = [
+                    //'current' =>  $page ?: 1,
+                    'paging' => ceil($totalPostsCount / $pagePostsCount)
+                ];
                 $data['category_page'] = 1;
             },
             '/about' => function () use (&$data) {

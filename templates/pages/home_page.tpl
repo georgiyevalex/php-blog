@@ -2,6 +2,7 @@
   <h3 class="mb-4 mt-2">Latest posts{if $category_page} in category "{$current_category}"{/if}</h3>
   <div class="row">
     <div class="col-md-9">
+        {$pagination|var_dump}
         {include file="../blocks/posts/card_view.tpl"}
     </div>
 
@@ -17,7 +18,7 @@
             <hr class="mt-2 mb-2">
 
           {foreach $categories as $category}
-            <a class="nav-link justify-content-between align-items-center d-flex{if $category.category_name == $current_category} active{/if}" aria-current="page" href="/categories/{$category.category_name}">{$category.category_name|upper}</a>
+            <a class="nav-link justify-content-between align-items-center d-flex{if $category.category_name == $current_category} active{/if}" aria-current="page" href="/categories/{$category.category_name}">{$category.category_name|ucfirst}</a>
             {if !$category@last}
               <hr class="mt-2 mb-2">
             {/if}
