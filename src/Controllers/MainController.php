@@ -72,37 +72,33 @@ class MainController
         $data = [];
         $data['user'] = $session->getData('user');
 
-        $pagePostsCount = 9;
-
-        var_dump($this->request->query->getInt('page'));
+        $pagePostsLimit = 6;
 
         $_routes = [
-            '/' => function () use ($pagePostsCount, $postMapper, $categories, &$data) {
-                var_dump($this->request->query);
-                $page = $this->request->query->getInt('page');
+            '/' => function () use ($pagePostsLimit, $postMapper, $categories, &$data) {
+                $page = $this->request->query->getInt('page') ?: 1;
                 $totalPostsCount = $postMapper->getTotalPostCount('');
-                $data['posts'] = $postMapper->getAllPosts('DESC');
+                $data['posts'] = $postMapper->getAllPosts($page, $pagePostsLimit, 'DESC');
                 $data['url'] = Destination::DESTINATION_HOME;
                 $data['categories'] = $categories->getAllCategories();
                 $data['pagination'] = [
-                    'current' =>  $page ?: 1,
-                    'paging' => ceil($totalPostsCount / $pagePostsCount)
+                    'current' =>  $page,
+                    'paging' => ceil($totalPostsCount / $pagePostsLimit)
                 ];
                 $data['main_page'] = 1;
             },
-            '/categories/{category}' => function () use ($pagePostsCount, $postMapper, $categories, &$data) {
+            '/categories/{category}' => function () use ($pagePostsLimit, $postMapper, $categories, &$data) {
                 $path = pathinfo($this->request->getPathInfo());
                 $category = $path['basename'];
-                //var_dump($this->request->query);
-                //$page = $this->request->query->getInt('page');
+                $page = $this->request->query->getInt('page') ?: 1;
                 $totalPostsCount = $postMapper->getTotalPostCount($category);
                 $data['categories'] = $categories->getAllCategories();
                 $data['current_category'] = $path['basename'];
-                $data['posts'] = $postMapper->getPostsByCategory($category, 'DESC');
+                $data['posts'] = $postMapper->getPostsByCategory($page, $pagePostsLimit, $category, 'DESC');
                 $data['url'] = Destination::DESTINATION_HOME;
                 $data['pagination'] = [
-                    //'current' =>  $page ?: 1,
-                    'paging' => ceil($totalPostsCount / $pagePostsCount)
+                    'current' =>  $page,
+                    'paging' => ceil($totalPostsCount / $pagePostsLimit)
                 ];
                 $data['category_page'] = 1;
             },

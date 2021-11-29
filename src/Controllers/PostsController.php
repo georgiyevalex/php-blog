@@ -52,34 +52,46 @@ class PostsController
     }
 
     /**
+     * @param int $page
+     * @param int $pagePostsLimit
      * @param string $direction
      * @return array|null
      * @throws PostsException
      */
-    public function getAllPosts(string $direction) : ?array
+    public function getAllPosts(int $page, int $pagePostsLimit, string $direction) : ?array
     {
         if(!in_array($direction, ['DESC', 'ASC'])) {
             throw new PostsException('The direction is not supported.');
         }
-        $statement = $this->connection->prepare('SELECT * FROM `post` ORDER BY `published_date` ' . $direction);
+        $start = ($page - 1) * $pagePostsLimit;
+        $statement = $this->connection->prepare(
+            'SELECT * FROM `post` ORDER BY `published_date` ' . $direction .
+            ' LIMIT ' . $start . ',' .$pagePostsLimit
+        );
         $statement->execute();
 
         return $statement->fetchAll();
     }
 
     /**
+     * @param int $page
+     * @param int $pagePostsLimit
      * @param string $category_name
      * @param string $direction
      * @return array|null
      * @throws PostsException
      */
-    public function getPostsByCategory(string $category_name, string $direction) : ?array
+    public function getPostsByCategory(int $page, int $pagePostsLimit, string $category_name, string $direction) : ?array
     {
         if(!in_array($direction, ['DESC', 'ASC'])) {
             throw new PostsException('The direction is not supported.');
         }
 
-        $statement = $this->connection->prepare('SELECT * FROM `post` WHERE `category` = :category ORDER BY `published_date` ' . $direction);
+        $start = ($page - 1) * $pagePostsLimit;
+        $statement = $this->connection->prepare(
+            'SELECT * FROM `post` WHERE `category` = :category ORDER BY `published_date` ' . $direction .
+            ' LIMIT ' . $start . ',' .$pagePostsLimit
+        );
         $statement->execute([
             'category' => $this->getCategoryID($category_name)
         ]);

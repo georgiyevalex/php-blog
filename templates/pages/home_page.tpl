@@ -2,8 +2,8 @@
   <h3 class="mb-4 mt-2">Latest posts{if $category_page} in category "{$current_category}"{/if}</h3>
   <div class="row">
     <div class="col-md-9">
-        {$pagination|var_dump}
         {include file="../blocks/posts/card_view.tpl"}
+        {include file="../blocks/blocks/pagination.tpl"}
     </div>
 
     <div class="col-md-3 nav-pills">
