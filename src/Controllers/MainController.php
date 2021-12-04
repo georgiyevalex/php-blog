@@ -3,10 +3,6 @@
 namespace Controllers;
 
 use Blog\Destination;
-use Controllers\PostsController;
-use Controllers\AuthorizationController;
-use Controllers\SearchController;
-use Controllers\CategoriesController;
 use App\Session;
 use Exceptions\AuthorizationException;
 use Exceptions\PostsException;
@@ -67,6 +63,7 @@ class MainController
         $authorization = new AuthorizationController($this->connection, $session);
         $search = new SearchController($this->connection);
         $categories = new CategoriesController($this->connection);
+        $commentaries = new CommentariesController($this->connection);
         $routes = new RouteCollection();
 
         $data = [];
@@ -132,13 +129,14 @@ class MainController
                 $this->response = new RedirectResponse("/posts/$params[url_key]");
                 $this->response->send();
             },
-            '/posts/{url_key}' => function () use ($postMapper, &$data) {
+            '/posts/{url_key}' => function () use ($commentaries, $postMapper, &$data) {
                 $path = pathinfo($this->request->getPathInfo());
                 $url_key = $path['basename'];
                 $post = $postMapper->getPostByUrlKey($url_key);
                 if($post) {
                     $data['url'] = Destination::DESTINATION_POSTS;
                     $data['post'] = $post;
+                    $data['commentaries'] = $commentaries->getCommentsByPostId($post['post_id']);
                 }
             },
             '/registration' => function () use ($session, &$data) {
