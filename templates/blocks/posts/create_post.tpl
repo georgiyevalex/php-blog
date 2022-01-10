@@ -3,7 +3,7 @@
         {$message}
     </div>
 {/if}
-<form action="/{Blog\CreateDestination::DESTINATION_CREATE_POST}" class="col g-3 needs-validation" method="post" name="create_post-form" enctype="multipart/form-data">
+<form action="/{Blog\CreateDestination::DESTINATION_CREATE_POST}" class="col g-3 needs-validation" method="post" name="create_post-form">
     <div class="col-md-6 mt-2">
         <label for="post_title" class="form-label">Title</label>
         <input type="text" class="form-control" placeholder="Enter title" id="post_title" name="title" value="{$post.title}">
