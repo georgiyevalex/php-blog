@@ -3,7 +3,7 @@
         {$message}
     </div>
 {/if}
-<form action="/{Blog\Destination::DESTINATION_REGISTER}" class="col g-3 needs-validation" method="post" name="form">
+<form action="/{Blog\CreateDestination::DESTINATION_REGISTER}" class="col g-3 needs-validation" method="post" name="form">
   <div class="col-md-6 mt-2">
     <label for="validationCustom01" class="form-label">First name</label>
     <input type="text" class="form-control" placeholder="Mark" name="first_name" value="{$form.first_name}">

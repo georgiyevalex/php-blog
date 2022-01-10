@@ -3,7 +3,7 @@
       {$message}
   </div>
 {/if}
-<form action="/{Blog\Destination::DESTINATION_LOGIN_PAGE}" class="col g-3 needs-validation" method="post" name="form">
+<form action="/{Blog\CreateDestination::DESTINATION_LOGIN_PAGE}" class="col g-3 needs-validation" method="post" name="login-form">
   <div class="col-md-6 mt-3">
     <label for="validationCustomEmail" class="form-label">Email</label>
     <div class="input-group has-validation">

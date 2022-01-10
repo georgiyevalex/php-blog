@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'dsn' => 'mysql:host=mysql8-container;dbname=php_blog',
-    'username' => 'user',
-    'password'=> 'password'
+    'dsn' => 'mysql:host=127.0.0.1;dbname=php_blog',
+    'username' => 'root',
+    'password'=> ''
 ];

@@ -64,6 +64,7 @@ class MainController
         $search = new SearchController($this->connection);
         $categories = new CategoriesController($this->connection);
         $commentaries = new CommentariesController($this->connection);
+        $userController = new UserController($this->connection);
         $routes = new RouteCollection();
 
         $data = [];
@@ -112,12 +113,15 @@ class MainController
                 $data['message'] = $session->flush('post_message');
                 $data['post'] = $session->flush('post');
                 $data['categories'] = $categories->getAllCategories();
+
             },
             '/create-post' => function () use ($postMapper, $session, &$data) {
                 parse_str($this->request->getContent(), $params);
+                var_dump($params);
+                var_dump($this->request->files);
 
                 try {
-                    $postMapper->createPost($params);
+                    $postMapper->createPost($params, $data['user']);
                 } catch (PostsException $exception) {
                     $session->setData('post_message', $exception->getMessage());
                     $session->setData('post', $params);
@@ -129,15 +133,40 @@ class MainController
                 $this->response = new RedirectResponse("/posts/$params[url_key]");
                 $this->response->send();
             },
-            '/posts/{url_key}' => function () use ($commentaries, $postMapper, &$data) {
+            '/posts/{url_key}' => function () use ($session, $userController, $commentaries, $postMapper, &$data) {
                 $path = pathinfo($this->request->getPathInfo());
                 $url_key = $path['basename'];
                 $post = $postMapper->getPostByUrlKey($url_key);
                 if($post) {
                     $data['url'] = Destination::DESTINATION_POSTS;
                     $data['post'] = $post;
-                    $data['commentaries'] = $commentaries->getCommentsByPostId($post['post_id']);
+                    $data['message'] = $session->flush('comment_message');
+                    $comments = $commentaries->getCommentsByPostId($post['post_id']);
+                    foreach ($comments as $key => $comment) {
+                        $data['commentaries'][$key] = $comment;
+                        $user = $userController->getUserById($comment['user_id']);
+                        $data['commentaries'][$key]['user'] = $user[0]['first_name'] . ' ' . $user[0]['last_name'];
+                    }
                 }
+            },
+            '/add-comment' => function () use ($session, $postMapper, $commentaries, &$data) {
+                if($data['user'] == null) {
+                    $this->response = new RedirectResponse('/');
+                    $this->response->send();
+                }
+
+                parse_str($this->request->getContent(), $params);
+
+                try {
+                    $commentaries->createComment($params, $data['user']);
+                } catch (PostsException $exception) {
+                    $session->setData('comment_message', $exception->getMessage());
+                    $session->save();
+                    $this->response = new RedirectResponse("/posts/$params[url_key]");
+                    $this->response->send();
+                }
+                $this->response = new RedirectResponse("/posts/$params[url_key]");
+                $this->response->send();
             },
             '/registration' => function () use ($session, &$data) {
                 if($data['user'] != null) {

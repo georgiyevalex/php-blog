@@ -3,7 +3,7 @@
         {$message}
     </div>
 {/if}
-<form action="/{Blog\Destination::DESTINATION_CREATE_POST}" class="col g-3 needs-validation" method="post" name="form">
+<form action="/{Blog\CreateDestination::DESTINATION_CREATE_POST}" class="col g-3 needs-validation" method="post" name="create_post-form" enctype="multipart/form-data">
     <div class="col-md-6 mt-2">
         <label for="post_title" class="form-label">Title</label>
         <input type="text" class="form-control" placeholder="Enter title" id="post_title" name="title" value="{$post.title}">
@@ -15,6 +15,10 @@
     <div class="col-md-6 mt-3">
         <label for="post_description" class="form-label">Description</label>
         <textarea class="form-control" name="description" id="post_description">{$post.description}</textarea>
+    </div>
+    <div class="col-md-6 mt-2">
+        <label for="image_path" class="form-label">Image</label>
+        <input type="file" class="form-control" id="image_path" name="image_path" value="{$post.image_path}">
     </div>
     <div class="col-md-6 mt-2">
         <label for="category" class="form-label">Category</label>

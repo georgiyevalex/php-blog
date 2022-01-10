@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Blog\ImagePath;
 use Exceptions\PostsException;
 use PDO;
 
@@ -34,6 +35,16 @@ class PostsController
         $category = $statement->fetchAll();
         $category = array_shift($category);
         return $category['category_id'];
+    }
+
+    private function addPostImage(string $imagePath, int $postId) :?bool
+    {
+        $statement = $this->connection->prepare('UPDATE `post` SET `image_path` = :image_path WHERE `post_id` = :post_id');
+        $statement->execute([
+            'post_id' => $postId,
+            'image_path' => $imagePath ? '/' . $postId . '/' . $imagePath : null,
+        ]);
+        return true;
     }
 
     /**
@@ -120,10 +131,11 @@ class PostsController
 
     /**
      * @param array $params
+     * @param array $user
      * @return bool
      * @throws PostsException
      */
-    public function createPost(array $params) : bool {
+    public function createPost(array $params, array $user) : bool {
         if(empty($params['title'])) {
             throw new PostsException('Title must not be empty.');
         }
@@ -132,6 +144,9 @@ class PostsController
         }
         if(empty($params['description'])) {
             throw new PostsException('Description must not be empty.');
+        }
+        if(empty($params['image_path'])) {
+            throw new PostsException('Image must not be empty.');
         }
         if(empty($params['url_key'])) {
             throw new PostsException('url_key must not be empty.');
@@ -157,17 +172,20 @@ class PostsController
         }
 
         $statement = $this->connection->prepare(
-            'INSERT INTO `post` (title, description, content, image_path, url_key, category, published_date) VALUES (:title, :description, :content, :image_path, :url_key, :category, :published_date)'
+            'INSERT INTO `post` (title, description, content, url_key, category, published_date, author_id) VALUES (:title, :description, :content, :url_key, :category, :published_date, :author_id)'
         );
         $statement->execute([
             'title' => $params['title'],
             'description' => $params['description'],
             'content' => $params['content'],
-            'image_path' => $params['image_path'] ?: null,
             'url_key' => $params['url_key'],
             'category' => $params['category'],
-            'published_date' => date("Y-m-d h:i:s")
+            'published_date' => date("Y-m-d h:i:s"),
+            'author_id' => $user['user_id']
         ]);
+
+        var_dump($this->connection->lastInsertId());
+        $this->addPostImage($params['image_path'], $this->connection->lastInsertId());
         return true;
     }
 }
