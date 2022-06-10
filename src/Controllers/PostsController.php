@@ -37,7 +37,7 @@ class PostsController
         return $category['category_id'];
     }
 
-    private function addPostImage(string $imagePath, int $postId) :?bool
+    /*private function addPostImage(string $imagePath, int $postId) :?bool
     {
         $statement = $this->connection->prepare('UPDATE `post` SET `image_path` = :image_path WHERE `post_id` = :post_id');
         $statement->execute([
@@ -45,7 +45,7 @@ class PostsController
             'image_path' => $imagePath ? '/' . $postId . '/' . $imagePath : null,
         ]);
         return true;
-    }
+    }*/
 
     /**
      * @param string $urlKey
@@ -130,44 +130,42 @@ class PostsController
     }
 
     /**
-     * @param array $params
+     * @param array $post_data
+     * @param object
      * @param array $user
      * @return bool
      * @throws PostsException
      */
-    public function createPost(array $params, array $user) : bool {
-        if(empty($params['title'])) {
+    public function createPost(array $post_data, ?object $file, array $user) : bool {
+        if(!$post_data['title']) {
             throw new PostsException('Title must not be empty.');
         }
-        if(empty($params['content'])) {
+        if(!$post_data['content']) {
             throw new PostsException('Content must not be empty.');
         }
-        if(empty($params['description'])) {
+        if(!$post_data['description']) {
             throw new PostsException('Description must not be empty.');
         }
-        if(empty($params['image_path'])) {
-            throw new PostsException('Image must not be empty.');
-        }
-        if(empty($params['url_key'])) {
+        if(!$post_data['url_key']) {
             throw new PostsException('url_key must not be empty.');
         }
-        if(empty($params['category'])) {
-            throw new PostsException('category must not be empty.');
-        }
-        if(preg_match("/^[a-z\d\-]+$/", $params['url_key'])) {
+        if(preg_match("/^[a-z\d\-]+$/", $post_data['url_key'])) {
 
         } else {
             throw new PostsException('the field can contain lowercase letters, numbers and a sign "-" ');
         }
+        if(!$post_data['category']) {
+            throw new PostsException('category must not be empty.');
+        }
 
         $statement = $this->connection->prepare(
-            'SELECT * FROM `post` WHERE `url_key` = :url_key'
+            'SELECT true FROM `post` WHERE `url_key` = :url_key'
         );
         $statement->execute([
-            'url_key' => $params['url_key']
+            'url_key' => $post_data['url_key']
         ]);
-        $post = $statement->fetch();
-        if (!empty($post)) {
+        $existing_post = $statement->fetch();
+        if ($existing_post) {
             throw new PostsException('post with such url_key exsists');
         }
 
@@ -175,17 +173,30 @@ class PostsController
             'INSERT INTO `post` (title, description, content, url_key, category, published_date, author_id) VALUES (:title, :description, :content, :url_key, :category, :published_date, :author_id)'
         );
         $statement->execute([
-            'title' => $params['title'],
-            'description' => $params['description'],
-            'content' => $params['content'],
-            'url_key' => $params['url_key'],
-            'category' => $params['category'],
+            'title' => $post_data['title'],
+            'description' => $post_data['description'],
+            'content' => $post_data['content'],
+            'url_key' => $post_data['url_key'],
+            'category' => $post_data['category'],
             'published_date' => date("Y-m-d h:i:s"),
             'author_id' => $user['user_id']
         ]);
 
-        var_dump($this->connection->lastInsertId());
-        $this->addPostImage($params['image_path'], $this->connection->lastInsertId());
+        if($file !== NULL) {
+            $postId = $this->connection->lastInsertId();
+            $fileExt = 'png';
+            try {
+                $file->move(ImagePath::POST_IMAGE_PATH, $postId . '.' . $fileExt);
+                    } catch (FileException $exception) {
+
+            }
+
+            $statement = $this->connection->prepare('UPDATE `post` SET `image_path` = :image_path WHERE `post_id` = :post_id');
+            $statement->execute([
+                'post_id' => $postId,
+                'image_path' => ImagePath::POST_IMAGE_PATH ? ImagePath::POST_IMAGE_PATH . $postId . '.' . $fileExt: null,
+            ]);
+        }
         return true;
     }
 }

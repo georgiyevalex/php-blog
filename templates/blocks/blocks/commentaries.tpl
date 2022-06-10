@@ -16,10 +16,10 @@
         {foreach $commentaries as $commentary}
             <div class="commented-section mt-2 mb-3">
                 <div class="d-flex flex-row align-items-center commented-user">
-                    <h5 class="me-3">{$commentary.user}</h5>
-                    <div class="mb-1 ml-2">{$commentary.published_date}</div>
+                    <h5 class="me-3">{$commentary.user|escape}</h5>
+                    <div class="mb-1 ml-2">{$commentary.published_date|escape}</div>
                 </div>
-                <div class="comment-text-sm"><span>{$commentary.comment}</span></div>
+                <div class="comment-text-sm"><span>{$commentary.comment|escape}</span></div>
             </div>
         {/foreach}
     {/if}

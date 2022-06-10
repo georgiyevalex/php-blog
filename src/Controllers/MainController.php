@@ -116,21 +116,19 @@ class MainController
 
             },
             '/create-post' => function () use ($postMapper, $session, &$data) {
-                parse_str($this->request->getContent(), $params);
-                var_dump($params);
-                var_dump($this->request->files);
-
+                $file = $this->request->files->get('image_path');
+                $post_data = $this->request->request->all();
                 try {
-                    $postMapper->createPost($params, $data['user']);
+                    $postMapper->createPost($post_data, $file, $data['user']);
                 } catch (PostsException $exception) {
                     $session->setData('post_message', $exception->getMessage());
-                    $session->setData('post', $params);
+                    $session->setData('post', $post_data);
                     $session->save();
                     $this->response = new RedirectResponse('/new-post');
                     $this->response->send();
                 }
 
-                $this->response = new RedirectResponse("/posts/$params[url_key]");
+                $this->response = new RedirectResponse("/posts/$post_data[url_key]");
                 $this->response->send();
             },
             '/posts/{url_key}' => function () use ($session, $userController, $commentaries, $postMapper, &$data) {
